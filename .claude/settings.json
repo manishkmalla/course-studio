@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npm --prefix:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx drizzle-kit generate:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(docker compose exec:*)",
+      "Bash(npx cdk synth:*)",
+      "Bash(npx cdk diff:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(docker compose down:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [
+      "Bash(aws:*)",
+      "Bash(npx cdk deploy:*)",
+      "Bash(npx cdk destroy:*)",
+      "Bash(npx cdk bootstrap:*)",
+      "Read(./.env)",
+      "Read(./**/.env)",
+      "Read(./**/*.pem)"
+    ],
+    "defaultMode": "acceptEdits"
+  }
+}
