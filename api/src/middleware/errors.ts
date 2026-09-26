@@ -5,6 +5,7 @@ export class HttpError extends Error {
   constructor(
     public status: number,
     message: string,
+    public extra?: Record<string, unknown>,
   ) {
     super(message);
   }
@@ -21,7 +22,7 @@ export function errorHandler(
     return;
   }
   if (err instanceof HttpError) {
-    res.status(err.status).json({ error: err.message });
+    res.status(err.status).json({ error: err.message, ...err.extra });
     return;
   }
   console.error(err);

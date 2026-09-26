@@ -5,19 +5,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import { app } from "../app.js";
 import { requireRole, requireUser } from "../middleware/auth.js";
 import { errorHandler } from "../middleware/errors.js";
-import { truncateAll } from "./helpers.js";
+import { setCookieHeader, truncateAll } from "./helpers.js";
 
 afterEach(async () => {
   await truncateAll();
 });
 
 const validBody = { email: "learner@demo.test", password: "Password1" };
-
-function setCookieHeader(res: request.Response): string[] {
-  const value = res.headers["set-cookie"];
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
 
 describe("POST /api/auth/register", () => {
   it("creates a learner and returns it without the password hash", async () => {
