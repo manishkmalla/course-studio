@@ -79,6 +79,13 @@ docker compose exec web npm run build
 
 ## Troubleshooting
 
+- **Host `npm ci` fails with `EACCES`**: running `docker compose up` first
+  creates `api/node_modules` and `web/node_modules` on the host as `root`
+  (they're anonymous-volume mount points). A later host-run `npm ci` then
+  can't write to them. Either run commands inside the containers
+  (`docker compose exec api ...` / `docker compose exec web ...`, the
+  normal way to run tests and typecheck — see above) or delete those
+  folders with `sudo` before installing on the host.
 - **A service still uses old dependencies after `docker compose up --build -V`**:
   `-V` only recreates *anonymous* volumes; the `api-node-modules` and
   `web-node-modules` volumes in `docker-compose.yml` are *named*, so they
