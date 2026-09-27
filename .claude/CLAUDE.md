@@ -33,8 +33,9 @@ touches course editing must preserve this and keep its test passing.
 
 - `api/`: Node 24, TypeScript (strict), Express 5, Zod 4, Drizzle ORM + `pg`,
   bcryptjs, jsonwebtoken, cookie-parser
-- `web/`: React + Vite + TypeScript, plain `fetch` wrapper in `src/lib/api.ts`,
-  plain CSS in one file, no router or UI library
+- `web/`: React + Vite + TypeScript, Tailwind CSS, shadcn/ui components
+  (copied into `src/components/ui/`), plain `fetch` wrapper in
+  `src/lib/api.ts`, no router library
 - `db`: Postgres 16 in Docker Compose (named volume)
 - Tests: Vitest + Supertest for the API; no automated frontend tests
 
@@ -50,14 +51,21 @@ Before using any package API, check the installed version in the relevant
 
 ```bash
 docker compose up --build            # full stack; migrations + seed run on api start
-docker compose up --build -V         # after adding/changing dependencies (renews the
-                                     # anonymous node_modules volumes, else deps are stale)
+docker compose up --build -V         # after adding/changing dependencies (renews
+                                     # anonymous volumes; the api/web node_modules
+                                     # volumes are named, so -V often isn't enough —
+                                     # see the reset command below if deps are stale)
 docker compose down -v               # wipe the DB (use for fresh-clone checks)
 docker compose exec api npm test     # PRIMARY way to run API tests
 docker compose exec api npm run typecheck
 docker compose exec web npm run typecheck
 docker compose exec web npm run build
 npm --prefix api run db:generate     # after editing api/src/db/schema.ts
+
+# If a service still has stale dependencies after `up --build -V` (its
+# node_modules volume is named, not anonymous, so -V doesn't recreate it):
+docker compose rm -sf web && docker volume rm course-studio_web-node-modules
+docker compose up --build -d web     # swap `web` for `api` if that's the stale one
 ```
 
 `.env` is optional for `docker compose up --build`; defaults live in
@@ -96,7 +104,7 @@ api/src/
   lib/           cursor.ts
   __tests__/
 web/src/
-  pages/, components/, lib/api.ts, types.ts, index.css
+  pages/, components/, components/ui/ (shadcn), lib/api.ts, lib/utils.ts, types.ts, index.css
 ```
 
 ## Rules
@@ -157,8 +165,11 @@ web/src/
 **TypeScript and React**
 - `strict: true`, no `any` (use `unknown` and narrow), no unexplained `as` casts.
 - Functional components; server data is fetched in page components and passed
-  down to presentational components. No inline `style={}`.
-- No `dangerouslySetInnerHTML`; lesson bodies render as plain text.
+  down to presentational components. Style with Tailwind utility classes and
+  shadcn/ui components; no inline `style={}` and no other CSS frameworks.
+- Use only the shadcn/ui components actually needed (e.g. button, input,
+  textarea, label, card, badge, progress, alert). Don't hand-edit files in
+  `src/components/ui/` unless necessary.
 
 **Security (local-app appropriate)**
 - Config comes from environment variables validated in `api/src/config.ts`
